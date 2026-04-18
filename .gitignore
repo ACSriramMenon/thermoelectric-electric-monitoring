@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+*.pyo
+
+.vscode/
+.env
+
+data/*.csv
+
+.DS_Store
+Thumbs.db
+
+arduino/build/
