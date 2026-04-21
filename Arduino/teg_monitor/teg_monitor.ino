@@ -1,9 +1,18 @@
-void setup() {
-  // put your setup code here, to run once:
-
+void setup(){
+  Serial.begin(9600);
 }
 
-void loop() {
-  // put your main code here, to run repeatedly:
+void loop(){
+  int rawTemp = analogRead(A0);
+  int rawVolt = analogRead(A1);
 
+  float temperature = rawTemp * (5.0 / 1023.0) * 100.0;
+  float voltage = rawVolt * (5.0 / 1023.0);
+
+  Serial.print("Temperature:");
+  Serial.print(temperature, 2);
+  Serial.print(", Voltage:");
+  Serial.println(voltage, 2);
+
+  delay(1000);
 }
