@@ -1,31 +1,31 @@
-import matplotlib
-matplotlib.use("TkAgg")
+import matplotlib                     #to draw graph
+matplotlib.use("TkAgg")               #set backend to tkinter compatable mode
 
 import tkinter as tk
-import subprocess
+import subprocess                     #Run fake data
 import sys
 import os
-from matplotlib.figure import Figure
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.figure import Figure  #Make graph figure
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg   #To connect matplotlib with tkinter
 
 FAKE_DATA = True                       #Make it false when connecting with arduino
 SERIAL_PORT = "COM3"
-BAUD = 9600
+BAUD = 9600         #Comminucation speed for Arduino
 
 if FAKE_DATA:
-    script_path = os.path.join(os.path.dirname(__file__), "temp_data.py")
-    process = subprocess.Popen([sys.executable, script_path], stdout=subprocess.PIPE, text=True)
+    script_path = os.path.join(os.path.dirname(__file__), "temp_data.py")   #Finds fake data path
+    process = subprocess.Popen([sys.executable, script_path], stdout=subprocess.PIPE, text=True)   
 
     def read_line():
         return process.stdout.readline().strip()
 else:
-    import serial
-    ser = serial.Serial(SERIAL_PORT, BAUD)
+    import serial   #Python to read Arduino data
+    ser = serial.Serial(SERIAL_PORT, BAUD)             
 
     def read_line():
         return ser.readline().decode().strip()
 
-root = tk.Tk()
+root = tk.Tk()       #Creates GUI window
 root.title("TEG Smart Energy Moniter")
 root.geometry("1000x600")
 root.configure(bg="#0f172a")
