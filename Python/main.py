@@ -8,11 +8,11 @@ import os
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
-USE_FAKE = True
+FAKE_DATA = True                       #Make it false when connecting with arduino
 SERIAL_PORT = "COM3"
 BAUD = 9600
 
-if USE_FAKE:
+if FAKE_DATA:
     script_path = os.path.join(os.path.dirname(__file__), "temp_data.py")
     process = subprocess.Popen([sys.executable, script_path], stdout=subprocess.PIPE, text=True)
 
@@ -134,7 +134,7 @@ def update():
     root.after(1500, update)
 
 def on_closing():
-    if USE_FAKE:
+    if FAKE_DATA:
         try:
             process.terminate()
         except:
