@@ -1,43 +1,48 @@
-import matplotlib                     #to draw graph
-matplotlib.use("TkAgg")               #set backend to tkinter compatable mode
+import matplotlib
+matplotlib.use("TkAgg")
 
 import tkinter as tk
-import subprocess                     #Run fake data
+import subprocess
 import sys
 import os
-from matplotlib.figure import Figure  #Make graph figure
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg   #To connect matplotlib with tkinter
+import time
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
-FAKE_DATA = False                       #Make it false when connecting with arduino
-SERIAL_PORT = "COM3"
-BAUD = 9600         #Comminucation speed for Arduino
+FAKE_DATA = False
+SERIAL_PORT = "COM5"
+BAUD = 9600
 
 if FAKE_DATA:
-    script_path = os.path.join(os.path.dirname(__file__), "temp_data.py")   #Finds fake data path
-    process = subprocess.Popen([sys.executable, script_path], stdout=subprocess.PIPE, text=True)   
+    script_path = os.path.join(os.path.dirname(__file__), "temp_data.py")
+    process = subprocess.Popen([sys.executable, script_path], stdout=subprocess.PIPE, text=True)
 
     def read_line():
         return process.stdout.readline().strip()
 else:
-    import serial   #Python to read Arduino data
-    ser = serial.Serial(SERIAL_PORT, BAUD)             
+    import serial
+    ser = serial.Serial(SERIAL_PORT, BAUD)
+    time.sleep(2) 
 
     def read_line():
-        return ser.readline().decode().strip()
+        try:
+            return ser.readline().decode().strip()
+        except:
+            return ""
 
-root = tk.Tk()       #Creates GUI window
-root.title("TEG Smart Energy Moniter")
+root = tk.Tk()
+root.title("TEG Smart Energy Monitor")
 root.geometry("1000x600")
 root.configure(bg="#0f172a")
 
 container = tk.Frame(root, bg="#0f172a")
-container.pack(fill="both", expand=True, padx = 20, pady = 10)
+container.pack(fill="both", expand=True, padx=20, pady=10)
 
 main_area = tk.Frame(container, bg="#0f172a")
 main_area.pack(fill="both", expand=True)
 
-title = tk.Label(main_area, text = "TEG Energy Monitor", font = ("Segoe UI", 20, "bold"), bg = "#0f172a", fg = "white")
-title.pack(anchor = "w", padx = 25, pady = (20, 10))
+title = tk.Label(main_area, text="TEG Energy Monitor",font=("Segoe UI", 20, "bold"),bg="#0f172a", fg="white")
+title.pack(anchor="w", padx=25, pady=(20, 10))
 
 card_frame = tk.Frame(main_area, bg="#0f172a")
 card_frame.pack(fill="x", padx=25, pady=10)
@@ -45,8 +50,9 @@ card_frame.pack(fill="x", padx=25, pady=10)
 def create_card(parent, text):
     frame = tk.Frame(parent, bg="#1f2937", padx=20, pady=15)
 
-    label = tk.Label(frame, text=text, font=("Segoe UI", 10), bg="#1f2937", fg="#9ca3af")
-    value = tk.Label(frame, text="--", font=("Segoe UI", 22, "bold"), bg="#1f2937", fg="#22d3ee")
+    label = tk.Label(frame, text=text,font=("Segoe UI", 10),bg="#1f2937", fg="#9ca3af")
+
+    value = tk.Label(frame, text="--",font=("Segoe UI", 22, "bold"),bg="#1f2937", fg="#22d3ee")
 
     label.pack(anchor="w")
     value.pack(anchor="w")
@@ -88,15 +94,17 @@ def get_status(voltage):
 
 def parse(line):
     try:
-        temp, volt = line.split(',')
-        t = float(temp.split(':')[1])
-        v = float(volt.split(':')[1])
+        parts = line.split(',')
+        t = float(parts[0].split(':')[1])
+        v = float(parts[1].split(':')[1])
         return t, v
     except:
+        print("Parse error:", line)
         return None, None
 
 def update():
     line = read_line()
+    print("RAW:", line)  # DEBUG
 
     if line:
         t, v = parse(line)
@@ -121,7 +129,7 @@ def update():
             ax.relim()
             ax.autoscale_view()
 
-            ax.set_title("Voltage Output", color="white", fontsize=12)
+            ax.set_title("Voltage Output", color="white")
             ax.tick_params(colors="white")
 
             for spine in ax.spines.values():
@@ -131,14 +139,11 @@ def update():
 
             canvas.draw()
 
-    root.after(1500, update)
+    root.after(1000, update)
 
 def on_closing():
-    if FAKE_DATA:
-        try:
-            process.terminate()
-        except:
-            pass
+    if not FAKE_DATA:
+        ser.close()
     root.destroy()
 
 update()
