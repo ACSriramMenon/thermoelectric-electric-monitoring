@@ -8,7 +8,7 @@ import os
 from matplotlib.figure import Figure  #Make graph figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg   #To connect matplotlib with tkinter
 
-FAKE_DATA = True                       #Make it false when connecting with arduino
+FAKE_DATA = False                       #Make it false when connecting with arduino
 SERIAL_PORT = "COM3"
 BAUD = 9600         #Comminucation speed for Arduino
 
