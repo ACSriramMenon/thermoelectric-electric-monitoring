@@ -5,81 +5,77 @@ import tkinter as tk
 import subprocess
 import sys
 import os
-import time
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
-FAKE_DATA = False
+USE_FAKE = True
 SERIAL_PORT = "COM5"
 BAUD = 9600
 
-if FAKE_DATA:
+if USE_FAKE:
     script_path = os.path.join(os.path.dirname(__file__), "temp_data.py")
-    process = subprocess.Popen([sys.executable, script_path], stdout=subprocess.PIPE, text=True)
+    process = subprocess.Popen([sys.executable, script_path], stdout = subprocess.PIPE, text = True)
 
     def read_line():
         return process.stdout.readline().strip()
 else:
     import serial
     ser = serial.Serial(SERIAL_PORT, BAUD)
-    time.sleep(2) 
 
     def read_line():
-        try:
-            return ser.readline().decode().strip()
-        except:
-            return ""
+        return ser.readline().decode().strip()
 
 root = tk.Tk()
 root.title("TEG Smart Energy Monitor")
 root.geometry("1000x600")
-root.configure(bg="#0f172a")
+root.configure(bg = "#0f172a")
 
-container = tk.Frame(root, bg="#0f172a")
-container.pack(fill="both", expand=True, padx=20, pady=10)
+container = tk.Frame(root, bg = "#0f172a")
+container.pack(fill = "both", expand = True, padx = 20, pady = 10)
 
-main_area = tk.Frame(container, bg="#0f172a")
-main_area.pack(fill="both", expand=True)
+main_area = tk.Frame(container, bg = "#0f172a")
+main_area.pack(fill = "both", expand = True)
 
-title = tk.Label(main_area, text="TEG Energy Monitor",font=("Segoe UI", 20, "bold"),bg="#0f172a", fg="white")
-title.pack(anchor="w", padx=25, pady=(20, 10))
+header_frame = tk.Label(main_area, bg = "#0f172a")
+header_frame.pack(fill = "x", pady = (15, 10))
 
-card_frame = tk.Frame(main_area, bg="#0f172a")
-card_frame.pack(fill="x", padx=25, pady=10)
+title = tk.Label(header_frame, text = "THERMOELECTRIC ENERGY MONITORING SYSTEM", font = ("Segoe UI", 22, "bold"), bg = "#0f172a", fg = "white")
+title.pack(anchor="center")
+
+subtitle = tk.Label(header_frame, text = "Real-Time Voltage Monitoring System using TEG", font = ("Segoe UI", 12), bg = "#0f172a", fg = "#9ca3af")
+subtitle.pack(anchor="center", pady = (5, 0))
+
+card_frame = tk.Frame(main_area, bg = "#0f172a")
+card_frame.pack(fill = "x", padx = 25, pady = (10, 5))
 
 def create_card(parent, text):
-    frame = tk.Frame(parent, bg="#1f2937", padx=20, pady=15)
-
-    label = tk.Label(frame, text=text,font=("Segoe UI", 10),bg="#1f2937", fg="#9ca3af")
-
-    value = tk.Label(frame, text="--",font=("Segoe UI", 22, "bold"),bg="#1f2937", fg="#22d3ee")
-
-    label.pack(anchor="w")
-    value.pack(anchor="w")
-
-    frame.pack(side="left", padx=12, pady=5)
+    frame = tk.Frame(parent, bg = "#1f2937", padx = 20, pady = 15)
+    label = tk.Label(frame, text = text, font = ("Segoe UI", 10), bg = "#1f2937", fg = "#9ca3af")
+    value = tk.Label(frame, text = "--", font = ("Segoe UI", 22, "bold"), bg = "#1f2937", fg = "#22d3ee")
+    label.pack(anchor = "w")
+    value.pack(anchor = "w")
+    frame.pack(side = "left", padx = 12, pady = 5)
     return value
 
-temp_value = create_card(card_frame, "Temperature (°C)")
 volt_value = create_card(card_frame, "Voltage (V)")
 status_value = create_card(card_frame, "System Status")
 
-graph_container = tk.Frame(main_area, bg="#0f172a")
-graph_container.pack(fill="both", expand=True, padx=25, pady=15)
+graph_container = tk.Frame(main_area, bg = "#0f172a")
+graph_container.pack(fill = "both", expand = True, padx = 25, pady = 15)
 
-graph_frame = tk.Frame(graph_container, bg="#1f2937", padx=15, pady=15)
-graph_frame.pack(fill="both", expand=True)
+graph_frame = tk.Frame(graph_container, bg = "#1f2937", padx = 15, pady = 15)
+graph_frame.pack(fill = "both", expand = True)
 
-fig = Figure(figsize=(6, 3), dpi=100)
+fig = Figure(figsize = (6, 3), dpi = 100)
 ax = fig.add_subplot(111)
 
 fig.patch.set_facecolor("#1f2937")
 ax.set_facecolor("#1f2937")
 
-canvas = FigureCanvasTkAgg(fig, master=graph_frame)
-canvas.get_tk_widget().pack(fill="both", expand=True)
+canvas = FigureCanvasTkAgg(fig, master = graph_frame)
+canvas.get_tk_widget().pack(fill = "both", expand = True)
 
-plot_line, = ax.plot([], [], linewidth=2)
+plot_line, = ax.plot([], [], linewidth = 2)
 
 x_data = []
 y_data = []
@@ -94,29 +90,21 @@ def get_status(voltage):
 
 def parse(line):
     try:
-        parts = line.split(',')
-        t = float(parts[0].split(':')[1])
-        v = float(parts[1].split(':')[1])
-        return t, v
+        return float(line.split(':')[1])
     except:
-        print("Parse error:", line)
-        return None, None
+        return None
 
 def update():
     line = read_line()
-    print("RAW:", line)  # DEBUG
 
     if line:
-        t, v = parse(line)
-
-        if t is not None:
-            temp_value.config(text=f"{t:.2f}")
+        v = parse(line)
 
         if v is not None:
-            volt_value.config(text=f"{v:.2f}")
+            volt_value.config(text = f"{v:.2f}")
 
             status, color = get_status(v)
-            status_value.config(text=status, fg=color)
+            status_value.config(text = status, fg = color)
 
             x_data.append(len(x_data))
             y_data.append(v)
@@ -129,21 +117,24 @@ def update():
             ax.relim()
             ax.autoscale_view()
 
-            ax.set_title("Voltage Output", color="white")
-            ax.tick_params(colors="white")
+            ax.set_title("Voltage Output", color = "white", fontsize = 12)
+            ax.tick_params(colors = "white")
 
             for spine in ax.spines.values():
                 spine.set_color("#374151")
 
-            ax.grid(alpha=0.2, linestyle="--")
+            ax.grid(alpha = 0.2, linestyle = "--")
 
             canvas.draw()
 
-    root.after(1000, update)
+    root.after(1500, update)
 
 def on_closing():
-    if not FAKE_DATA:
-        ser.close()
+    if USE_FAKE:
+        try:
+            process.terminate()
+        except:
+            pass
     root.destroy()
 
 update()
