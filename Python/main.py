@@ -82,11 +82,11 @@ y_data = []
 
 def get_status(voltage):
     if voltage > 2:
-        return "Good", "#22c55e"
+        return "Good", "green"
     elif voltage > 1:
-        return "Moderate", "#f59e0b"
+        return "Moderate", "yellow"
     else:
-        return "Low", "#ef4444"
+        return "Low", "red"
 
 def parse(line):
     try:
