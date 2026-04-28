@@ -8,7 +8,7 @@ import os
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
-USE_FAKE = False
+USE_FAKE = True
 SERIAL_PORT = "COM5"
 BAUD = 9600
 
