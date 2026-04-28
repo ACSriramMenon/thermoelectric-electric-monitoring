@@ -81,9 +81,9 @@ x_data = []
 y_data = []
 
 def get_status(voltage):
-    if voltage > 2:
+    if voltage > 1:
         return "Good", "green"
-    elif voltage > 1:
+    elif voltage > 0.5:
         return "Moderate", "yellow"
     else:
         return "Low", "red"

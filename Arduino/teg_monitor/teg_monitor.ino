@@ -5,7 +5,7 @@ void setup() {
 void loop() {
   int AnalogVolt = analogRead(A1);
 
-  float voltage = AnalogVolt * (5.0 / 1023.0) * 5;
+  float voltage = AnalogVolt * (5.0 / 1023.0) * 7;
 
   Serial.print(",Volt:");
   Serial.println(voltage, 2);
