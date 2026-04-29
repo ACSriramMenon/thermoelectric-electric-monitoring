@@ -8,7 +8,7 @@ import os
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
-USE_FAKE = True
+USE_FAKE = True             #Turn False when connecting to Arduino
 SERIAL_PORT = "COM5"
 BAUD = 9600
 
