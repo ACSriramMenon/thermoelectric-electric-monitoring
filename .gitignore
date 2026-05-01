@@ -1,13 +1,28 @@
+# Python
 __pycache__/
 *.pyc
 *.pyo
+*.pyd
 
-.vscode/
+# Virtual environments
 .env
+.env/
+venv/
 
-data/*.csv
+# VS Code
+.vscode/
 
+# Logs and temp
+*.log
+*.tmp
+*.temp
+
+# OS files
 .DS_Store
 Thumbs.db
 
-arduino/build/
+# Arduino build files
+*.ino.cpp
+*.elf
+*.hex
+Arduino/build/
